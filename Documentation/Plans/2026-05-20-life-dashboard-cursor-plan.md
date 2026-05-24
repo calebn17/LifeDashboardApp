@@ -26,7 +26,7 @@
 
 ## Todo Checklist
 
-- [ ] **Task 1: Add FitnessTracker Debug Auth** — Add tested local debug auth bypass without weakening normal Supabase JWT validation.
+- [x] **Task 1: Add FitnessTracker Debug Auth** — Add tested local debug auth bypass without weakening normal Supabase JWT validation.
 - [ ] **Task 2: Move VaultTracker to Port 8001** — Update startup script so VaultTracker can run beside FitnessTracker.
 - [ ] **Task 3: Scaffold the macOS Dashboard Project** — Create a buildable SwiftUI app scaffold with tests wired.
 - [ ] **Task 4: Add Local API Configuration** — Centralize localhost URLs and debug bearer tokens.
