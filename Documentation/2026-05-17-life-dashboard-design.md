@@ -85,9 +85,9 @@ AppNavigation (owns DashboardViewModel)
 
 **Design system:** `AppTheme` (colors, spacing, radius), `AppTypography`, `.glassCard()` modifier.
 
-**Reusable components:** `RingGauge`, `SparklineChart` (Swift Charts), `ProgressBarView`, `GlassCard`, `MetricView`.
+**Reusable components:** `RingGauge`, `SparklineChart` (Swift Charts), `ProgressBarView`, `.glassCard()` modifier, `MetricView`.
 
-**Local-only UI state (no API):** daily schedule timeline, task checkboxes, deep-work countdown timer.
+**Local-only UI state (no API):** daily schedule timeline (static), task checkboxes and deep-work timer via `CockpitLocalState` (survives tab switches, not persisted).
 
 **Unchanged:** networking layer, Codable models, `DashboardViewModel` fetch orchestration, debug auth tokens, parallel per-domain error handling.
 

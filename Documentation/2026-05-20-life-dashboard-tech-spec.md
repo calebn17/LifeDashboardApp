@@ -869,7 +869,7 @@ LifeDashboard/
 | `RecoveryCard` / `SleepCard` | `healthToday` |
 | Section pages | Same properties; errors filtered by `DashboardError.id` |
 
-Schedule, tasks, and deep-work timer use `@State` only (no persistence).
+Schedule is static UI. Tasks and deep-work timer use `CockpitLocalState` in `AppNavigation` (in-memory only, no persistence).
 
 ---
 
