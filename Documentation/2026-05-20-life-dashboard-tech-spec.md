@@ -1,7 +1,7 @@
 # Life Dashboard — Technical Specification
 
-**Date:** 2026-05-20
-**Status:** Implemented (V1 local dashboard)
+**Date:** 2026-05-20 (UI revamp: 2026-05-24)
+**Status:** Implemented (V1 local dashboard + Premium Dark Cockpit UI)
 **Design Doc:** `LifeDashboard/2026-05-17-life-dashboard-design.md`
 
 ---
@@ -833,32 +833,43 @@ On app launch, hit `GET /health` on FitnessTracker and `GET /` on VaultTracker (
 
 ```
 LifeDashboard/
-├── LifeDashboard.xcodeproj
+├── Package.swift                        # SwiftPM executable, macOS 14+
 ├── LifeDashboard/
 │   ├── App/
-│   │   └── LifeDashboardApp.swift
+│   │   ├── LifeDashboardApp.swift       # WindowGroup → AppNavigation
+│   │   └── WindowConfigurator.swift     # Hidden title bar, draggable background
 │   ├── Configuration/
 │   │   └── APIConfiguration.swift       # Base URLs, ports, auth tokens
-│   ├── Networking/
-│   │   ├── APIClient.swift              # Shared HTTP layer
-│   │   ├── APIError.swift               # Error types
-│   │   ├── VaultAPIClient.swift         # VaultTracker endpoints
-│   │   └── FitnessAPIClient.swift       # FitnessTracker endpoints
-│   ├── Models/
-│   │   ├── VaultModels.swift            # Codable types for vault responses
-│   │   ├── FitnessModels.swift          # Codable types for activity responses
-│   │   └── HealthModels.swift           # Codable types for wearable responses
+│   ├── Theme/
+│   │   ├── AppTheme.swift
+│   │   ├── AppTypography.swift
+│   │   └── ViewModifiers.swift          # .glassCard()
+│   ├── Navigation/
+│   │   ├── NavigationDestination.swift
+│   │   ├── SidebarView.swift
+│   │   └── AppNavigation.swift        # Owns @StateObject DashboardViewModel
+│   ├── Networking/                      # Unchanged from V1
+│   ├── Models/                          # Unchanged from V1
 │   ├── ViewModels/
-│   │   └── DashboardViewModel.swift     # Orchestrates all fetches
-│   └── Views/                           # UI (designed separately)
+│   │   └── DashboardViewModel.swift     # Shared @ObservedObject across pages
+│   └── Views/
+│       ├── Components/                  # HeaderBar, RingGauge, SparklineChart, …
+│       ├── Dashboard/                   # Card grid + assembly DashboardView
+│       ├── Investments/ Fitness/ Recovery/ Settings/
 ├── LifeDashboardTests/
-│   ├── Networking/
-│   │   ├── VaultAPIClientTests.swift
-│   │   └── FitnessAPIClientTests.swift
-│   └── ViewModels/
-│       └── DashboardViewModelTests.swift
 └── CLAUDE.md
 ```
+
+### UI data binding (revamp)
+
+| View | ViewModel properties |
+|------|---------------------|
+| `NetWorthCard` | `vaultDashboard`, `fireProjection` |
+| `RunPerformanceCard` | `recentActivities`, `activitySummary` |
+| `RecoveryCard` / `SleepCard` | `healthToday` |
+| Section pages | Same properties; errors filtered by `DashboardError.id` |
+
+Schedule, tasks, and deep-work timer use `@State` only (no persistence).
 
 ---
 

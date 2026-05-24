@@ -11,7 +11,9 @@ swift test
 swiftlint lint
 ```
 
-Open `Package.swift` in Xcode to run the GUI app (minimum window 1200×800). **Cmd+R** refreshes the dashboard.
+Open `Package.swift` in Xcode to run the GUI app (minimum window 1200×800). Root view is `AppNavigation` (sidebar + cockpit dashboard). **Cmd+R** in the header triggers refresh.
+
+UI revamp plan: [Documentation/Plans/2026-05-24-life-dashboard-ui-revamp-plan.md](Documentation/Plans/2026-05-24-life-dashboard-ui-revamp-plan.md)
 
 ## Local backends (manual integration)
 
@@ -38,3 +40,4 @@ Configured in `LifeDashboard/Configuration/APIConfiguration.swift`:
 - [Documentation/2026-05-17-life-dashboard-design.md](Documentation/2026-05-17-life-dashboard-design.md)
 - [Documentation/2026-05-20-life-dashboard-tech-spec.md](Documentation/2026-05-20-life-dashboard-tech-spec.md)
 - [Documentation/Plans/2026-05-20-life-dashboard-cursor-plan.md](Documentation/Plans/2026-05-20-life-dashboard-cursor-plan.md)
+- [Documentation/Plans/2026-05-24-life-dashboard-ui-revamp-plan.md](Documentation/Plans/2026-05-24-life-dashboard-ui-revamp-plan.md)
