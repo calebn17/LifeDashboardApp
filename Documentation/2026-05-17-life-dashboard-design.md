@@ -1,7 +1,7 @@
 # Life Dashboard — Design Spec
 
-**Date:** 2026-05-17
-**Status:** Implemented (V1)
+**Date:** 2026-05-17 (UI revamp: 2026-05-24)
+**Status:** Implemented (V1 + Premium Dark Cockpit UI)
 
 ## Context
 
@@ -56,16 +56,40 @@ Both backends are self-hosted on the same machine. All communication is over loc
 LifeDashboard/
 ├── Package.swift                            # Swift Package (macOS 14+)
 ├── LifeDashboard/
-│   ├── App/LifeDashboardApp.swift
+│   ├── App/LifeDashboardApp.swift           # Root → AppNavigation
 │   ├── Configuration/APIConfiguration.swift
+│   ├── Theme/                               # AppTheme, typography, glassCard modifier
+│   ├── Navigation/                          # Sidebar + destination routing
 │   ├── Models/                              # Vault, Fitness, Health Codable types
 │   ├── Networking/                          # APIClient, domain clients, protocols
-│   ├── ViewModels/DashboardViewModel.swift
-│   └── Views/                               # Dashboard + panels + GlassCard components
+│   ├── ViewModels/DashboardViewModel.swift  # Shared across all pages
+│   └── Views/                               # Dashboard cards, section pages, components
 ├── LifeDashboardTests/
-├── Assets/stitch_unified_life_metrics_dashboard/DESIGN.md
+├── Assets/stitch_unified_life_metrics_dashboard/
 └── CLAUDE.md
 ```
+
+## UI Architecture (2026-05-24 Revamp)
+
+The app uses a **Premium Dark Cockpit** layout with a custom 240px sidebar (no `NavigationSplitView` vibrancy conflicts on pure-black background).
+
+```
+AppNavigation (owns DashboardViewModel)
+├── SidebarView → NavigationDestination (dashboard, investments, fitness, recovery, settings)
+├── HeaderBar (title, search pill, status, refresh)
+└── Content
+    ├── DashboardView — card grid (net worth, run, recovery/sleep, schedule, tasks, timer)
+    ├── InvestmentsView / FitnessView / RecoveryView — section detail pages
+    └── SettingsView — static local config display
+```
+
+**Design system:** `AppTheme` (colors, spacing, radius), `AppTypography`, `.glassCard()` modifier.
+
+**Reusable components:** `RingGauge`, `SparklineChart` (Swift Charts), `ProgressBarView`, `.glassCard()` modifier, `MetricView`.
+
+**Local-only UI state (no API):** daily schedule timeline (static), task checkboxes and deep-work timer via `CockpitLocalState` (survives tab switches, not persisted).
+
+**Unchanged:** networking layer, Codable models, `DashboardViewModel` fetch orchestration, debug auth tokens, parallel per-domain error handling.
 
 ## Architectural Decisions
 

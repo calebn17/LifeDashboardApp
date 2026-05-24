@@ -32,7 +32,9 @@
       "Bash(gh pr:*)",
       "Bash(../VaultTrackerAPI/venv/bin/python -m pytest tests/ -v --tb=short)",
       "Bash(../VaultTrackerAPI/venv/bin/ruff check:*)",
-      "Bash(PYTHONPATH=. pytest tests/unit/test_supabase_jwt_validation.py -v)"
+      "Bash(PYTHONPATH=. pytest tests/unit/test_supabase_jwt_validation.py -v)",
+      "Skill(superpowers:brainstorming)",
+      "Bash(swift test *)"
     ]
   }
 }
