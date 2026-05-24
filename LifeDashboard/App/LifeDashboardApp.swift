@@ -4,9 +4,11 @@ import SwiftUI
 struct LifeDashboardApp: App {
     var body: some Scene {
         WindowGroup {
-            DashboardView()
+            AppNavigation()
                 .frame(minWidth: 1200, minHeight: 800)
+                .background(WindowConfigurator())
         }
         .windowResizability(.contentMinSize)
+        .defaultSize(width: 1200, height: 800)
     }
 }

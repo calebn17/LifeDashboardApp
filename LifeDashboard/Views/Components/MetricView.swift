@@ -5,12 +5,13 @@ struct MetricView: View {
     let value: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
             Text(label)
-                .font(.system(size: 10))
-                .foregroundStyle(.secondary)
+                .font(AppTypography.metricLabel)
+                .foregroundStyle(AppTheme.Colors.onSurfaceSecondary)
             Text(value)
-                .font(.system(size: 16, weight: .medium, design: .monospaced))
+                .font(AppTypography.dataMono)
+                .foregroundStyle(AppTheme.Colors.onSurface)
         }
     }
 }
