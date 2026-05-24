@@ -1,7 +1,7 @@
 # Life Dashboard — Design Spec
 
 **Date:** 2026-05-17
-**Status:** Draft
+**Status:** Implemented (V1)
 
 ## Context
 
@@ -54,25 +54,16 @@ Both backends are self-hosted on the same machine. All communication is over loc
 
 ```
 LifeDashboard/
-├── LifeDashboard.xcodeproj
+├── Package.swift                            # Swift Package (macOS 14+)
 ├── LifeDashboard/
-│   ├── App/
-│   │   └── LifeDashboardApp.swift           # App entry point, window config
-│   ├── ViewModels/
-│   │   └── DashboardViewModel.swift         # Orchestrates fetches from both APIs
-│   ├── Networking/
-│   │   ├── APIClient.swift                  # Shared HTTP layer (URLSession + async/await)
-│   │   ├── FitnessAPIClient.swift           # FitnessTracker API endpoints (running + health)
-│   │   └── VaultAPIClient.swift             # VaultTracker API endpoints
-│   ├── Models/
-│   │   ├── FitnessModels.swift              # Codable types for running/activity responses
-│   │   ├── HealthModels.swift               # Codable types for sleep/recovery/strain responses
-│   │   └── VaultModels.swift                # Codable types for vault responses
-│   ├── Views/                               # UI (to be designed separately)
-│   └── Configuration/
-│       └── APIConfiguration.swift           # Base URLs, ports, auth tokens
+│   ├── App/LifeDashboardApp.swift
+│   ├── Configuration/APIConfiguration.swift
+│   ├── Models/                              # Vault, Fitness, Health Codable types
+│   ├── Networking/                          # APIClient, domain clients, protocols
+│   ├── ViewModels/DashboardViewModel.swift
+│   └── Views/                               # Dashboard + panels + GlassCard components
 ├── LifeDashboardTests/
-│   └── ...
+├── Assets/stitch_unified_life_metrics_dashboard/DESIGN.md
 └── CLAUDE.md
 ```
 

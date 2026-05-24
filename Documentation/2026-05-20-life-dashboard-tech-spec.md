@@ -1,7 +1,7 @@
 # Life Dashboard — Technical Specification
 
 **Date:** 2026-05-20
-**Status:** Draft
+**Status:** Implemented (V1 local dashboard)
 **Design Doc:** `LifeDashboard/2026-05-17-life-dashboard-design.md`
 
 ---
@@ -52,40 +52,17 @@ VaultTracker supports a debug auth mode for local development.
 
 The dashboard sends this static Bearer token on every VaultTracker request. No token refresh needed.
 
-### 3b. FitnessTracker — Supabase JWT
+### 3b. FitnessTracker — Debug Auth (implemented)
 
-FitnessTracker validates JWTs signed with Supabase's HS256 secret.
+FitnessTracker supports local debug auth (same pattern as VaultTracker) when `DEBUG_AUTH_ENABLED=true`.
 
 | Setting | Value |
 |---------|-------|
-| Env var | `SUPABASE_JWT_SECRET` (in FitnessTracker's `.env`) |
-| Header | `Authorization: Bearer <jwt>` |
-| Required claims | `sub` (user UUID), `aud` ("authenticated"), `exp` (expiration) |
-| Optional claims | `email` (used on first request to provision user row) |
+| Env var | `DEBUG_AUTH_ENABLED=true` (FitnessTracker `.env`) |
+| Header | `Authorization: Bearer fitnesstracker-debug-user` |
+| Behavior | Bypasses Supabase JWT decode; synthetic claims `sub: "debug-user"` |
 
-**No debug auth mode exists** in FitnessTracker. Two options for the dashboard:
-
-**Option A — Pre-generate a long-lived JWT (recommended for V1):**
-Generate a JWT locally using the same `SUPABASE_JWT_SECRET`, with a far-future `exp`. Store this token in `APIConfiguration.swift`. This avoids needing a Supabase project running locally.
-
-```python
-# One-time script to generate a dashboard token
-import jwt, time
-token = jwt.encode(
-    {
-        "sub": "dashboard-user-uuid",
-        "email": "dashboard@local",
-        "aud": "authenticated",
-        "exp": int(time.time()) + (365 * 24 * 3600),  # 1 year
-    },
-    "your-supabase-jwt-secret",
-    algorithm="HS256",
-)
-print(token)
-```
-
-**Option B — Add debug auth to FitnessTracker:**
-Add a debug auth bypass to `app/core/security.py` matching VaultTracker's pattern (check for a static token when `DEBUG_AUTH_ENABLED=true`). This is cleaner long-term but requires modifying the FitnessTracker backend.
+Production paths still use Supabase HS256 JWT validation when debug auth is disabled.
 
 ### 3c. APIConfiguration.swift
 
@@ -93,9 +70,9 @@ Add a debug auth bypass to `app/core/security.py` matching VaultTracker's patter
 enum APIConfiguration {
     enum Fitness {
         static let baseURL = URL(string: "http://localhost:8000")!
-        static let authToken = "<pre-generated-jwt-or-debug-token>"
+        static let authToken = "fitnesstracker-debug-user"
     }
-    
+
     enum Vault {
         static let baseURL = URL(string: "http://localhost:8001")!
         static let authToken = "vaulttracker-debug-user"
