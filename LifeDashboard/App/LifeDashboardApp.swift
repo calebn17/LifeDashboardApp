@@ -4,7 +4,7 @@ import SwiftUI
 struct LifeDashboardApp: App {
     var body: some Scene {
         WindowGroup {
-            Text("Life Dashboard")
+            DashboardView()
                 .frame(minWidth: 1200, minHeight: 800)
         }
         .windowResizability(.contentMinSize)

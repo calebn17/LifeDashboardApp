@@ -33,11 +33,11 @@ final class APIClient: Sendable {
         let response: URLResponse
         do {
             (data, response) = try await session.data(for: request)
-        } catch let urlError as URLError
-            where urlError.code == .cannotConnectToHost
-            || urlError.code == .networkConnectionLost
-            || urlError.code == .timedOut
-        {
+        } catch let urlError as URLError where [
+            .cannotConnectToHost,
+            .networkConnectionLost,
+            .timedOut
+        ].contains(urlError.code) {
             throw APIError.backendUnavailable
         }
 

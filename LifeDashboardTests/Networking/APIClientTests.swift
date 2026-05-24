@@ -3,19 +3,28 @@ import XCTest
 
 final class APIClientTests: XCTestCase {
 
-    private var session: URLSession!
-    private var client: APIClient!
+    private var session: URLSession?
+    private var client: APIClient?
 
     override func setUp() {
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [MockURLProtocol.self]
-        session = URLSession(configuration: config)
+        let testSession = URLSession(configuration: config)
+        session = testSession
         client = APIClient(
             baseURL: URL(string: "http://localhost:9999")!,
             authToken: "test-token",
-            session: session,
+            session: testSession,
             keyDecodingStrategy: .convertFromSnakeCase
         )
+    }
+
+    private func requireClient() -> APIClient {
+        guard let client else {
+            XCTFail("APIClient not configured")
+            fatalError("APIClient not configured")
+        }
+        return client
     }
 
     override func tearDown() {
@@ -35,7 +44,7 @@ final class APIClientTests: XCTestCase {
             return (response, data)
         }
 
-        let result: HealthCheckResponse = try await client.get(path: "/health")
+        let result: HealthCheckResponse = try await requireClient().get(path: "/health")
         XCTAssertEqual(result.status, "healthy")
     }
 
@@ -49,7 +58,7 @@ final class APIClientTests: XCTestCase {
         }
 
         do {
-            let _: HealthCheckResponse = try await client.get(path: "/test")
+            let _: HealthCheckResponse = try await requireClient().get(path: "/test")
             XCTFail("Expected APIError.unauthorized")
         } catch let error as APIError {
             XCTAssertEqual(error, .unauthorized)
@@ -68,7 +77,7 @@ final class APIClientTests: XCTestCase {
         }
 
         do {
-            let _: HealthCheckResponse = try await client.get(path: "/test")
+            let _: HealthCheckResponse = try await requireClient().get(path: "/test")
             XCTFail("Expected APIError.rateLimited")
         } catch let error as APIError {
             XCTAssertEqual(error, .rateLimited)
@@ -90,7 +99,7 @@ final class APIClientTests: XCTestCase {
             return (response, data)
         }
 
-        let _: HealthCheckResponse = try await client.get(
+        let _: HealthCheckResponse = try await requireClient().get(
             path: "/test",
             queryItems: [URLQueryItem(name: "period", value: "week")]
         )
@@ -102,7 +111,7 @@ final class APIClientTests: XCTestCase {
         }
 
         do {
-            let _: HealthCheckResponse = try await client.get(path: "/health")
+            let _: HealthCheckResponse = try await requireClient().get(path: "/health")
             XCTFail("Expected APIError.backendUnavailable")
         } catch let error as APIError {
             XCTAssertEqual(error, .backendUnavailable)
