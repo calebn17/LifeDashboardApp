@@ -1,0 +1,203 @@
+---
+description: Generic project agent rules — permissions, context-before-plan, change communication, design for scale, security, plans/todos, docs sync, and implementation checkpoints. Copy into any repo's .cursor/rules/ and customize the "Project layout" section.
+alwaysApply: true
+---
+
+# Project — agent rules
+
+Portable agent guidance for Cursor. Copy this file into a project's `.cursor/rules/` (rename if you like, e.g. `project-agent-rules.mdc`). Customize **Project layout** below for that repo. All other sections apply unless the user asks for minimal output or to skip review.
+
+---
+
+## Permissions
+
+Boundaries for tool use in this workspace:
+
+- **Search and read** — May use **all search and discovery tools** without separate permission (e.g. semantic/codebase search, ripgrep-style search, glob/file listing, reading files, listing MCP tools/resources for inspection).
+- **Tests** — May run **shell commands whose primary purpose is running automated tests** without separate permission (e.g. `pytest`, `npm test` / `vitest`, `xcodebuild test`, project test scripts). Prefer the repo's documented commands from README, `CLAUDE.md` / `AGENTS.md`, and `.github/workflows/` (or equivalent CI config) when present.
+- **Lint** — May run **shell commands whose primary purpose is running linters or format checks** without separate permission (e.g. `ruff`, `mypy`, `npm run lint`, `npx prettier --check`, `swiftlint`). Prefer the same documented commands and CI.
+- **Edits and mutations** — **Require explicit user permission before proceeding** for any tool or action that **writes, modifies, deletes, or otherwise mutates** state: repository files, patches, deletes, git operations that change history or remotes, dependency/lockfile changes, MCP tools that modify external systems, or similar. Confirm with the user (or wait for their go-ahead) before mutating; do not assume silence implies consent.
+
+---
+
+## Project layout (customize per repo)
+
+Fill in or replace this section when you adopt the rule in a new project. Until customized, **discover** layout from the repo root (README, monorepo folders, `package.json` / `pyproject.toml`, CI workflows).
+
+| Role | Typical locations (adjust for your repo) |
+|------|------------------------------------------|
+| **Global system design** | `docs/`, `Documentation/`, `ARCHITECTURE.md`, or `documentation/system_design.md` at repo root |
+| **Stack / service design** | Per-app or per-package `documentation/`, `docs/architecture/`, or stack README |
+| **Runbooks & agent constraints** | Root `CLAUDE.md`, `AGENTS.md`, `.agent-harness/CLAUDE.md`; **prefer the most local** file for the area you are editing |
+| **Implementation plans** | `docs/plans/`, `Documentation/Plans/`, `ROADMAP.md`, or issue/milestone docs |
+| **CI & quality gates** | `.github/workflows/`, `.gitlab-ci.yml`, `Makefile`, package scripts in `package.json` |
+| **Env templates (non-secret)** | `.env.example`, documented config modules — never commit real `.env` |
+
+---
+
+## Context before plans and implementation
+
+Before **creating a Cursor plan**, **writing multi-step task lists**, or **implementing** changes that touch architecture, APIs, domains, or cross-cutting behavior, **read or skim** authoritative docs for big-picture alignment (do not rely on code search alone for intent and boundaries):
+
+1. **Global system design** — Repo-wide architecture, data flow, API contracts, and product behavior (see **Project layout**).
+2. **Stack design spec** — For the stack or package you are changing, read that component's design doc or README when present.
+3. **CLAUDE.md / AGENTS.md** — Prefer the **most local** agent/runbook file for the work area, then repository root, then harness or shared agent config if the repo uses one. When both root and stack-local exist, **stack-local wins** for that stack's commands and rules.
+4. **Phased roadmap (when applicable)** — If the task maps to a documented phase or milestone, skim the relevant plan section so scope, checkpoints, and "done" match the plan.
+
+**Depth:** Aim for **targeted skimming** (headings, TOC, sections for the surfaces you will change) unless the user asks for exhaustive review. **Narrow, localized edits** (typo fixes, obvious single-file tweaks) may skip this when the user requests minimal scope.
+
+---
+
+## Change communication
+
+When you make or review code changes in this repository:
+
+1. **Keep the user in the loop** — For each logical batch of work (a feature slice, a refactor phase, or a fix), briefly state what you are doing or just did so they can follow along without reading every hunk.
+
+2. **High-level diff summary** — After edits, summarize the **diff** in plain language:
+   - **Files touched** (paths or areas: e.g. `backend/`, `apps/web`, tests, docs)
+   - **Behavior change** (what the API, UI, or tests do differently now)
+   - **Why** (spec, bug, cleanup) when it is not obvious
+
+   Prefer short bullets or a few sentences per area; do not paste the entire patch unless asked.
+
+3. **Order** — Present summaries in a sensible order (e.g. types/contracts → networking → services → routes/handlers → jobs/workers → tests → config).
+
+4. **Checkpoints** — After risky or user-visible changes (environment URLs, auth, data models), note what to **build, run, or test** to verify.
+
+This complements phase-specific plans and should apply unless the user asks for minimal output only.
+
+---
+
+## Design for scale
+
+- **Design for scale.** Prefer patterns that stay sound as usage and domains grow: respect **existing layering** in the stack you are touching (e.g. handlers vs services vs data access, UI vs state vs API client), avoid unbounded queries and accidental N+1 or O(n²) paths where lists and aggregations are involved, and use pagination, batching, caching, and indexing in line with how the project already handles reads and writes. When a shortcut trades clarity or performance for speed, call that out and fix it before it becomes load-bearing.
+
+Align significant structural choices with the project's system design docs when they exist.
+
+---
+
+## Security
+
+- **Secrets** — Never commit API keys, passwords, or production credentials; keep `.env*`, private keys, and service tokens out of repos, screenshots, and chat.
+- **APIs** — Verify identity on every protected route; scope reads and writes to the authenticated principal (and tenant/user id when multi-tenancy applies); validate and bound inputs at boundaries; return errors that do not leak stack traces, tokens, or other users' data.
+- **Clients** — Use TLS for remote APIs; follow the project's auth flows; avoid logging PII, tokens, or full sensitive payloads.
+
+### Environment file access policy
+
+- **Do not read, inspect, print, summarize, or search `.env` files** (including `.env`, `.env.*`, and any secret-bearing env file) unless the user has **EXPLICITLY** requested it in the current conversation.
+- If a task might involve env values, first ask for confirmation instead of opening env files.
+- Prefer `.env.example`, docs, or documented config defaults for guidance.
+- Never expose env file contents in chat, logs, diffs, commits, or screenshots.
+- Violation of this rule is a hard stop: the agent must refuse and request explicit user authorization.
+
+---
+
+## Plans and todo granularity
+
+When you **create or execute a plan** (including `TodoWrite` / task lists in chat), follow **Context before plans and implementation** so plans reflect system and stack specs plus agent/runbook constraints before tasks are drafted:
+
+### Todo items must be committable units
+
+- **One bullet = one logical commit** — Each todo should represent a coherent change that could be committed on its own (tests + implementation for that slice, or one isolated refactor), not a vague mega-task.
+- **Split large work** — Prefer several small todos over one todo that mixes unrelated files or concerns.
+- **Name todos for the diff** — Wording should map clearly to what would appear in a commit message (e.g. "Add list endpoint tests" not "Do backend").
+
+### Todo items must be testable
+
+- **Verifiable completion** — Each todo must spell out (implicitly or in the plan) how you know it is done: automated tests, lint/build, a manual check, or another observable outcome — not an open-ended "improve X" with no check.
+- **Prefer runnable proof for code** — When the slice changes application or API behavior, default to including or extending **tests** (or an equivalent automated check) in that same todo so the commit is both committable and falsifiable.
+
+### Test quality
+
+- **Validate real behavior** — Write tests that exercise **actual functionality** and **would fail if a regression is introduced**; do **not** write tests only to have passing tests. Assertions should check the **real system** under test using **meaningful inputs and outputs** (e.g. HTTP responses, persisted data, domain results, error cases), not hollow or self-fulfilling checks.
+
+### Stop for review after each todo
+
+- **After completing a single todo item**, **pause**: summarize what changed, then **wait for the user to review** before starting the next item.
+- **Exception** — Only continue through multiple todos without stopping if the user explicitly asks to batch, skip review, or "do the rest."
+
+### Keep the checklist in sync
+
+- **When a todo is finished** — Update the task list (e.g. `TodoWrite`) right away: mark that item **completed**, and do not leave items **in_progress** once the work is done.
+- **Accuracy** — The checklist the user sees should match what is actually done; refresh it after each completed unit of work, not only at the end of a session.
+
+### Full-plan documentation sync
+
+- **Plan creation requirement** — Every newly created plan must include a **final todo item** to update **system design** documentation at the right level:
+  - **Global (repository-wide):** Cross-cutting architecture, data flow, API contracts, and product behavior — wherever this repo documents them (see **Project layout**).
+  - **Per stack (local):** For each app, package, or service whose architecture or behavior the plan changes, update that component's local design doc or architecture README.
+- **Scope of that final todo** — Same facts as **Change communication** (architecture, data-flow, API contract, client behavior), placed in the global doc and in each touched stack's local design doc so both the whole-system view and stack-specific detail stay current.
+
+This pairs with **Change communication** and optional checkpoint modes in **Implementation (pair programming)** below.
+
+---
+
+## Docs and runbook sync
+
+When **a plan or implementation slice is finished** (user confirms completion, or you deliver the last planned step), **or** when the user **asks you to make commits** (or prepare a commit / PR):
+
+**Before every commit** — Run linting and each touched stack's usual static checks for **all** areas your diff touches; fix failures before committing unless the user explicitly approves an exception. **Match what CI runs** for those paths (discover from workflows and package scripts).
+
+### Formatting
+
+Run the formatters and linters CI enforces for each touched stack (e.g. Prettier, Ruff, ESLint, SwiftLint). Do not rely on a subset if CI runs more.
+
+1. **Keep runbooks accurate** — After substantive changes, update **commands and rules only** in README, `CLAUDE.md`, `AGENTS.md`, or stack-local runbooks. **Do not** paste long-form system design into runbooks; keep that in architecture/design docs.
+
+2. **What to add to runbooks** — Short, durable bullets: new commands, scripts, env vars (names only, not values), how to verify, and pointers to design docs when readers need architecture context. Do **not** duplicate full specs that belong in system design docs.
+
+3. **Edge case** — Pure typo or formatting-only edits may omit runbook updates unless the user asked for commits (then ensure the commit message still describes the change).
+
+This complements **Change communication** (session summaries) with **persistent** context.
+
+---
+
+## Implementation (pair programming / learning)
+
+Use when extending a **service, app, library, or integration** in this repo. Complements **Change communication** above.
+
+### Architecture (discover, do not assume)
+
+Before large changes, infer structure from the repo: monorepo vs single package, API vs UI vs workers, data stores, and how components talk (REST, GraphQL, events, etc.). Document assumptions in summaries when the repo lacks a global diagram.
+
+Example pattern (replace labels with your project):
+
+```mermaid
+flowchart LR
+  subgraph clients [Clients]
+    ClientA[Client apps]
+  end
+  subgraph services [Services]
+    API[API / BFF]
+    Core[Domain logic]
+    Jobs[Workers / jobs]
+    API --> Core
+    Jobs --> Core
+  end
+  subgraph data [Data]
+    DB[(Primary store)]
+    Cache[(Cache / queue)]
+  end
+  Core --> DB
+  API --> Cache
+  Jobs --> Cache
+  ClientA -->|protocol per spec| API
+```
+
+### Learning checkpoints (pair-programming pauses)
+
+When the user asks to **pause after each phase or section** of a plan, work in **small batches**, stop after each agreed checkpoint, and explain **what** changed, **why** it matters, and **how to verify** (use that repo's documented dev/lint/test commands).
+
+- **Default:** A plain **"execute"** may ship work in **larger batches**; still give high-level summaries per **Change communication**.
+- **Checkpoint mode:** When the user says **"use the plan checkpoints"**, **"pause after each phase"**, or similar, follow the active plan file and **stop** after each checkpoint until they say **continue**.
+- **Retrospective:** They can ask for a walkthrough **without new code** to map plan sections to files already in the repo.
+
+If a plan file differs from this rule, **follow the plan** and update this rule when the checkpoint scheme changes.
+
+### Related docs (discover in repo)
+
+- Global system design (see **Project layout**)
+- Stack-specific design docs for components you touch
+- Implementation plans / roadmap
+- README and CI workflows for verify commands
