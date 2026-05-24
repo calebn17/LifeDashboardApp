@@ -4,9 +4,9 @@ import XCTest
 final class VaultModelsTests: XCTestCase {
 
     private func decoder() -> JSONDecoder {
-        let d = JSONDecoder()
-        d.dateDecodingStrategy = .iso8601
-        return d
+        let jsonDecoder = JSONDecoder()
+        jsonDecoder.dateDecodingStrategy = .iso8601
+        return jsonDecoder
     }
 
     func testDecodeDashboardResponse() throws {

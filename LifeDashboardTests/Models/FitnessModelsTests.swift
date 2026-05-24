@@ -4,9 +4,9 @@ import XCTest
 final class FitnessModelsTests: XCTestCase {
 
     private func decoder() -> JSONDecoder {
-        let d = JSONDecoder()
-        d.keyDecodingStrategy = .convertFromSnakeCase
-        return d
+        let jsonDecoder = JSONDecoder()
+        jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
+        return jsonDecoder
     }
 
     func testDecodeActivitiesRecentResponse() throws {
