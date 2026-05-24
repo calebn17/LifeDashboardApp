@@ -957,6 +957,22 @@ Phase 3 can start in parallel with Phase 1 — the VaultTracker panel and networ
 
 ## 12. Testing Strategy
 
+### CI (GitHub Actions)
+
+Workflow: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) on `macos-14`, two jobs in order:
+
+1. **lint** — `swiftlint lint` (config: [`.swiftlint.yml`](../.swiftlint.yml))
+2. **unit-tests** — `swift test` (runs only after lint succeeds)
+
+Triggers: push to `main`, all pull requests.
+
+Local verification (same commands as CI):
+
+```bash
+swiftlint lint
+swift test
+```
+
 ### Unit Tests
 - `APIClient`: mock `URLProtocol` to test JSON decoding, error mapping, auth header injection
 - `VaultAPIClient` / `FitnessAPIClient`: verify correct paths and query params are constructed

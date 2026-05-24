@@ -30,7 +30,7 @@
 - [x] **Task 2: Move VaultTracker to Port 8001** — Update startup script so VaultTracker can run beside FitnessTracker.
 - [x] **Task 3: Scaffold the macOS Dashboard Project** — Create a buildable SwiftUI app scaffold with tests wired.
 - [x] **Task 4: Add Local API Configuration** — Centralize localhost URLs and debug bearer tokens.
-- [ ] **Task 5: Add Codable Models and Decode Tests** — Define Vault, activity, and health models with representative decode coverage.
+- [x] **Task 5: Add Codable Models and Decode Tests** — Define Vault, activity, and health models with representative decode coverage.
 - [ ] **Task 6: Add Shared Networking Layer** — Add tested URLSession client, auth injection, decoding, and HTTP error mapping.
 - [ ] **Task 7: Add Domain API Clients** — Wrap VaultTracker and FitnessTracker endpoints in typed clients.
 - [ ] **Task 8: Add Dashboard ViewModel** — Fetch domains concurrently with loading state and per-domain error isolation.
